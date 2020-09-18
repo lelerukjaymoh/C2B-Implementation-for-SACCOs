@@ -4,16 +4,15 @@ from django.views.generic import ListView
 from c2b.models import C2bPayment
 from django.http import JsonResponse
 from c2b.logic import SetCallback
-import pprint
 import json
 
 
 """" A register_url is a view used for registering the callback urls """
 
 def register_url(request):
-    pay = SetCallback()
-    access_token = pay.get_token()
-    response = pay.register_url(access_token)
+    callback = SetCallback()
+    access_token = callback.get_token()
+    response = callback.register_url(access_token)
     return HttpResponse("<h3>Registering Urls was a <u>" + response['ResponseDescription'] + "</u></h3>")
 
 
@@ -35,10 +34,8 @@ def validation(request):
 
 @csrf_exempt
 def confirmation(request):
-    print('-------------- confirmation ------------------')
     mpesa_body =request.body.decode('utf-8')
     mpesa_payment = json.loads(mpesa_body)
-    pprint.pprint(mpesa_payment)
 
     payment = C2bPayment(
         first_name=mpesa_payment['FirstName'],

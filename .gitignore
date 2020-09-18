@@ -3,4 +3,3 @@ venv/
 # migrations/
 .env
  __pycache __/
- c2b/c2b/__pycache __/

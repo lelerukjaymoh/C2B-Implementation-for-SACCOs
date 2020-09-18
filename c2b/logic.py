@@ -1,7 +1,6 @@
 from django.conf import settings
 import requests
 from requests.auth import HTTPBasicAuth
-import pprint
 
 class SetCallback:
     # Get credentials from settings
@@ -19,10 +18,9 @@ class SetCallback:
     """
 
     def get_token(self):
-        authentication_URL = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials" # Endpoint
+        authentication_URL = "https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials" # Endpoint
         response = requests.get(authentication_URL, auth=HTTPBasicAuth(self.consumer_key, self.consumer_secret))
         if response.status_code == 200: # Check if it was successfull then continue
-            print(response.json())
             return response.json()['access_token']
 
 
@@ -34,7 +32,7 @@ class SetCallback:
 
     """
     def register_url(self, access_token):
-        url_register = 'https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl'
+        url_register = 'https://api.safaricom.co.ke/mpesa/c2b/v1/registerurl'
         headers = {'Authorization': 'Bearer %s' % access_token, 'content-type': 'application/json'}
         body = {
             "ShortCode": "%s" % self.shortcode,
@@ -44,14 +42,9 @@ class SetCallback:
         }
 
         response = requests.post(url_register, headers=headers, json=body)
-        pprint.pprint(response.json())
-        print(url_register, headers, body)
 
         if response.status_code == 200:
             return response.json()
-        else:
-            print('Register urls response contains error')
-        
 
 
     """ 
