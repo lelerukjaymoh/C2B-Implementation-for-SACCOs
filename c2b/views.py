@@ -1,35 +1,37 @@
-from django.shortcuts import render
+from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView
 from c2b.models import C2bPayment
 from django.http import JsonResponse
-from c2b.logic import Pay
+from c2b.logic import SetCallback
 import pprint
 import json
 
-def home(request):
-    pay = Pay()
+
+"""" A register_url is a view used for registering the callback urls """
+
+def register_url(request):
+    pay = SetCallback()
     access_token = pay.get_token()
     response = pay.register_url(access_token)
-    pprint.pprint(response)
-    print('')
-    r = pay.c2b_payment(access_token)
-    print('********************************')
-    pprint.pprint(r)
-    print('')
-    return render(request, 'home.html', {})
+    return HttpResponse("<h3>Registering Urls was a <u>" + response['ResponseDescription'] + "</u></h3>")
+
+
+"""" Validation endpoint that validates transactions """
 
 @csrf_exempt
 def validation(request):
-    print('--------------- validation ---------------')
-    data = json.loads(request.body)
-    pprint.pprint(data)
-    print('')
+    # This validation endpoint has been included incase there need to scale the app's funtionality in the future and 
+    # include the validation of a transaction. As of now all transactions are accepted
+
     context = {
         "ResultCode": 0,
         "ResultDesc": "Accepted"
     }
     return JsonResponse(dict(context))
+
+
+"""" Confirmation endpoint that confirms transactions """
 
 @csrf_exempt
 def confirmation(request):
@@ -57,6 +59,8 @@ def confirmation(request):
         "ResultDesc": "Accepted"
     }
     return JsonResponse(dict(context))
+
+""" TransactionsListView lists all transactions by fetching from the database and displaying in template """
 
 class TransactionsListView(ListView):
     model = C2bPayment
