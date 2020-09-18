@@ -17,6 +17,8 @@ BASE_URL = os.getenv('BASE_URL')
 CONSUMER_KEY = os.getenv('CONSUMER_KEY')
 CONSUMER_SECRET = os.getenv('CONSUMER_SECRET')
 SHORTCODE = os.getenv('SHORTCODE')
+AT_USERNAME = os.getenv('AT_USERNAME')
+AT_API_KEY = os.getenv('AT_API_KEY')
 
 
 # SECURITY WARNING: don't run with debug turned on in production!

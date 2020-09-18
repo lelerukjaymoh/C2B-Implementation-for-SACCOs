@@ -1,9 +1,11 @@
+from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView
 from c2b.models import C2bPayment
 from django.http import JsonResponse
 from c2b.logic import SetCallback
+from c2b.logic import Notify
 import json
 
 
@@ -13,7 +15,7 @@ def register_url(request):
     callback = SetCallback()
     access_token = callback.get_token()
     response = callback.register_url(access_token)
-    return HttpResponse("<h3>Registering Urls was a <u>" + response['ResponseDescription'] + "</u></h3>")
+    return render(request, 'home.html', {})
 
 
 """" Validation endpoint that validates transactions """
@@ -35,26 +37,37 @@ def validation(request):
 @csrf_exempt
 def confirmation(request):
     mpesa_body =request.body.decode('utf-8')
-    mpesa_payment = json.loads(mpesa_body)
+    mpesa_payment = json.loads(mpesa_body) 
+
+    # Get payment details from response
+    first_name = mpesa_payment['FirstName']
+    amount = mpesa_payment['TransAmount']
+    account_no = mpesa_payment['BillRefNumber']
+    phone_number = mpesa_payment['MSISDN']
+    
 
     payment = C2bPayment(
-        first_name=mpesa_payment['FirstName'],
-        last_name=mpesa_payment['LastName'],
-        middle_name=mpesa_payment['MiddleName'],
-        description=mpesa_payment['TransID'],
-        phone_number=mpesa_payment['MSISDN'],
-        amount=mpesa_payment['TransAmount'],
-        reference=mpesa_payment['BillRefNumber'],
-        organization_balance=mpesa_payment['OrgAccountBalance'],
-        type=mpesa_payment['TransactionType'],
+        first_name = first_name,
+        last_name = mpesa_payment['LastName'],
+        middle_name = mpesa_payment['MiddleName'],
+        description = mpesa_payment['TransID'],
+        phone_number = phone_number,
+        amount = amount,
+        reference = account_no,
+        organization_balance = mpesa_payment['OrgAccountBalance'],
+        type = mpesa_payment['TransactionType'],
     )
     payment.save()
-
 
     context = {
         "ResultCode": 0,
         "ResultDesc": "Accepted"
     }
+
+    # Notifying customer on successful transaction
+    notify = Notify()
+    notify.notify_customer(first_name, amount, account_no, phone_number)
+
     return JsonResponse(dict(context))
 
 """ TransactionsListView lists all transactions by fetching from the database and displaying in template """

@@ -1,6 +1,7 @@
 from django.conf import settings
 import requests
 from requests.auth import HTTPBasicAuth
+import africastalking
 
 class SetCallback:
     # Get credentials from settings
@@ -31,6 +32,7 @@ class SetCallback:
     in case the validation URL is unreachable. 
 
     """
+
     def register_url(self, access_token):
         url_register = 'https://api.safaricom.co.ke/mpesa/c2b/v1/registerurl'
         headers = {'Authorization': 'Bearer %s' % access_token, 'content-type': 'application/json'}
@@ -42,17 +44,15 @@ class SetCallback:
         }
 
         response = requests.post(url_register, headers=headers, json=body)
-
         if response.status_code == 200:
             return response.json()
 
-
+    
     """ 
 
     c2b_payment_simulator is only used in Sandbox enviroment to simulate a C2B transaction by a client to a paybill. 
 
     """
-
 
     def c2b_payment_simulator(self, access_token):
         # payment_url is a sandbox endpoint for simulating a C2B transaction
@@ -68,3 +68,25 @@ class SetCallback:
 
         response = requests.post(payment_url, headers=headers, json=body)
         return response.json()
+
+
+class Notify:
+    # Get the Africas Talking credentials
+    AT_username = settings.AT_USERNAME
+    AT_api_key = settings.AT_API_KEY
+
+    def __init__(self):
+        # Initialising the Africas Talking SDK
+        africastalking.initialize(self.AT_username, self.AT_api_key)
+
+        # Get the SMS service
+        self.sms = africastalking.SMS
+
+    def notify_customer(self, first_name, amount, account_no, phone_number):
+        recipients = [phone_no]
+        message = f"Hello {first_name}, we have received your payment of {amount} for the account {account_no}. Thanks for choosing Neno Sacco"
+       
+        try:
+            response = self.sms.send(message, recipients)
+        except Exception as e:
+            print ('Encountered an error while sending: %s' % str(e))
