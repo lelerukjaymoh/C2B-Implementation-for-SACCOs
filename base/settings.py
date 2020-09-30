@@ -13,12 +13,15 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "Icg8&@y/Uk&T5b3O$<&,gJ$3ID&&df"
 
-BASE_URL = os.getenv('BASE_URL')
-CONSUMER_KEY = os.getenv('CONSUMER_KEY')
-CONSUMER_SECRET = os.getenv('CONSUMER_SECRET')
-SHORTCODE = os.getenv('SHORTCODE')
-AT_USERNAME = os.getenv('AT_USERNAME')
-AT_API_KEY = os.getenv('AT_API_KEY')
+BASE_URL = "nenosacco.co.ke"
+CONSUMER_KEY = "LDu3QIsYlqf7BOuFP0soLIGuvgPIB6zA"
+CONSUMER_SECRET = "h3YpUzizkOFRwjbK"
+SHORTCODE = "235811"
+AT_USERNAME = "neno"
+AT_SMS_HEADER = "NENO_SACCO"
+AT_API_KEY = "2dc655067ee371d16ed930ea109c458828e4c844ea7b9aa8131edb5106829648"
+
+
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
