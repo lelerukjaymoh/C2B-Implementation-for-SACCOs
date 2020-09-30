@@ -4,18 +4,20 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView
 from c2b.models import C2bPayment
 from django.http import JsonResponse
-from c2b.logic import SetCallback
-from c2b.logic import Notify
+from c2b.logic import SetCallback, Notify
 import json
 
 
 """" A register_url is a view used for registering the callback urls """
+# NOTE: The register_url should only be used once to register the callback urls, after successfull registration the url for 
+# the view should be disabled by probably deleting the url for the register_url view in urls.py.
 
 def register_url(request):
     callback = SetCallback()
     access_token = callback.get_token()
     response = callback.register_url(access_token)
-    return render(request, 'home.html', {})
+    html = "<html><body>The callback urls registration response is a : <b>%s</b> </body></html>" % str(response['ResponseDescription'])
+    return HttpResponse(html)
 
 
 """" Validation endpoint that validates transactions """
@@ -64,9 +66,9 @@ def confirmation(request):
         "ResultDesc": "Accepted"
     }
 
-    # Notifying customer on successful transaction
-    notify = Notify()
-    notify.notify_customer(first_name, amount, account_no, phone_number)
+    # Notifying customer on successful transaction --> COMMENTED OUT SENDING NOTIFICATIONS TO CUSTOMERS
+    # notify = Notify()
+    # notify.notify_customer(first_name, amount, account_no, phone_number)
 
     return JsonResponse(dict(context))
 
