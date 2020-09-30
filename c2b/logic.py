@@ -83,7 +83,7 @@ class Notify:
         self.sms = africastalking.SMS
 
     def notify_customer(self, first_name, amount, account_no, phone_number):
-        recipients = [phone_no]
+        recipients = [phone_number]
         message = f"Hello {first_name}, we have received your payment of {amount} for the account {account_no}. Thanks for choosing Neno Sacco"
        
         try:
